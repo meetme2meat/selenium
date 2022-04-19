@@ -8,11 +8,13 @@ def make_call(count)
   auth_token = ENV["AUTH_TOKEN"]
   @client = Twilio::REST::Client.new(account_sid, auth_token)
 
-  call = @client.calls.create(
-                        url: 'http://demo.twilio.com/docs/voice.xml',
-                        to: ENV["TO"],
-                        from: ENV["FROM"]
-                      )
-
-  $logger.info call.sid
+  numbers = ENV["TO"].split(",")
+  numbers.each do |number|
+    call = @client.calls.create(
+                          url: 'http://demo.twilio.com/docs/voice.xml',
+                          to: number,
+                          from: ENV["FROM"]
+                        )
+    $logger.info "#{number} => #{call.sid}"
+  end
 end
