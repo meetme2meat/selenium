@@ -35,11 +35,11 @@ end
 $logger.info Process.pid
 
 $logger.info "creating driver ..."
-# options = Selenium::WebDriver::Chrome::Options.new
-# options.add_argument('--headless')
-# driver = Selenium::WebDriver.for :chrome, options: options
-driver = Selenium::WebDriver.for :chrome
-
+options = Selenium::WebDriver::Chrome::Options.new
+options.add_argument('--headless')
+driver = Selenium::WebDriver.for :chrome, options: options
+#driver = Selenium::WebDriver.for :chrome
+driver.manage.window.resize_to(1024, 900)
 driver.navigate.to "https://heliservices.uk.gov.in/User/userlogin.aspx"
 $logger.info "navigated to home page"
 
@@ -63,6 +63,7 @@ driver.find_element(id: "ContentPlaceHolderBody_btn_login").click()
 $logger.info "login page filled and clicked entering loop"
 ## check login 
 $runner = true
+#driver.manage.window.resize_to(1024, 900)
 while($runner) do
   sleepTime = 200
   screenshot(driver)
