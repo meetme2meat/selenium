@@ -91,7 +91,7 @@ while($runner) do
       3.times { |i| make_call(i); sleep 60 } 
       sleepTime = 20
     else
-      $logger.info "same now change .."
+      $logger.info "now change .."
     end
   else
     $logger.error "some problem -> calendar month does not match"
