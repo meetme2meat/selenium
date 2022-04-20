@@ -53,7 +53,7 @@ password = ENV["PASSWORD"]
 $logger.info "entering login ..."
 driver.find_element(id: "ContentPlaceHolderBody_txtname").send_keys(user)
 driver.find_element(id: "ContentPlaceHolderBody_txtpwd").send_keys(password)
-puts "awaiting captcha... "
+$logger.info "awaiting captcha... "
 server = UNIXServer.new(SOCKET)
 socket = server.accept
 captcha = socket.readline
