@@ -60,6 +60,7 @@ socket = server.accept
 captcha = socket.readline
 captcha.chomp!
 socket.close()
+$logger.info "got catpcha as ... #{captcha}"
 driver.find_element(id: "ContentPlaceHolderBody_tbCaptha").clear()
 driver.find_element(id: "ContentPlaceHolderBody_tbCaptha").send_keys(captcha)
 driver.find_element(id: "ContentPlaceHolderBody_btn_login").click()
@@ -74,7 +75,7 @@ while($runner) do
   ## check login
   $logger.info "visting check availability.."
   driver.navigate.to "https://heliservices.uk.gov.in/User/CheckAvailability.aspx"
-  
+  sleep 5
   driver.find_element(id: 'ContentPlaceHolderBody_txtDepartDate').click()
 
   $logger.info "taking screenshot ..."
