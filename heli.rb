@@ -7,6 +7,7 @@ require "./twilio.rb"
 
 SOCKET = "/tmp/selenium.sock"
 
+FileUtils.rm(SOCKET)
 ## remove directory
 ["screenshot", "logs"].each do |dir|
   newDir = File.join(Dir.pwd, dir)
