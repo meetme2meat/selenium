@@ -7,7 +7,7 @@ require "./twilio.rb"
 
 SOCKET = "/tmp/selenium.sock"
 
-FileUtils.rm(SOCKET)
+FileUtils.rm_rf(SOCKET)
 ## remove directory
 ["screenshot", "logs"].each do |dir|
   newDir = File.join(Dir.pwd, dir)
@@ -73,8 +73,10 @@ while($runner) do
   sleepTime = 200
   screenshot(driver)
   ## check login
+
   $logger.info "visting check availability.."
-  driver.navigate.to "https://heliservices.uk.gov.in/User/CheckAvailability.aspx"
+  driver.find_element(css: 'div.menu-1 > ul li a').click()
+  # driver.navigate.to "https://heliservices.uk.gov.in/User/CheckAvailability.aspx"
   sleep 5
   driver.find_element(id: 'ContentPlaceHolderBody_txtDepartDate').click()
 
@@ -88,6 +90,8 @@ while($runner) do
       $logger.error "we found 21st to a valid day now, make call"
       3.times { |i| make_call(i); sleep 60 } 
       sleepTime = 20
+    else
+      $logger.info "same now change .."
     end
   else
     $logger.error "some problem -> calendar month does not match"
@@ -95,6 +99,7 @@ while($runner) do
     3.times { |i| make_call(i); sleep 60 }
     sleepTime = 20
   end  
+  $logger.info "Sleeping for #{sleepTime} seconds"
   sleep sleepTime
 end
 driver.quit()
