@@ -66,6 +66,7 @@ password = ENV["PASSWORD"]
 $logger.info "entering login ..."
 driver.find_element(id: "ContentPlaceHolderBody_txtname").send_keys(user)
 driver.find_element(id: "ContentPlaceHolderBody_txtpwd").send_keys(password)
+$logger.info "echo \"1234567890\" | socat - UNIX-CONNECT:/tmp/selenium.sock"
 $logger.info "awaiting captcha... "
 captcha = wait()
 $logger.info "got catpcha as ... #{captcha}"
@@ -87,6 +88,7 @@ while($runner) do
     $logger.info "making precautionary calls ..."
     make_call(1)
     $logger.info "waiting for the input"
+    screenshot(driver)
     exceptionCount = wait().to_i
   end
   ## check login
