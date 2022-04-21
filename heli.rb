@@ -32,9 +32,20 @@ end
 def screenshot(driver)
   $screenshot += 1
   driver.save_screenshot("#{Dir.pwd}/screenshot/screenshot-#{$screenshot}.png")
+  $logger.info "scp #{ENV['SSH_HOST']}:/home/virendranegi/selenium/screenshot/screenshot-#{$screenshot}.png ."
 end
 
-
+def wait()
+  $logger.info "entering unix mode"
+  server = UNIXServer.new(SOCKET)
+  socket = server.accept
+  captcha = socket.readline
+  captcha.chomp!
+  socket.close()
+  FileUtils.rm_rf(SOCKET)
+  $logger.info "exiting unix mode"
+  return captcha
+end
 
 $logger.info Process.pid
 
@@ -49,17 +60,14 @@ $logger.info "navigated to home page"
 
 screenshot(driver)
 
+
 user = ENV["USER"]
 password = ENV["PASSWORD"]
 $logger.info "entering login ..."
 driver.find_element(id: "ContentPlaceHolderBody_txtname").send_keys(user)
 driver.find_element(id: "ContentPlaceHolderBody_txtpwd").send_keys(password)
 $logger.info "awaiting captcha... "
-server = UNIXServer.new(SOCKET)
-socket = server.accept
-captcha = socket.readline
-captcha.chomp!
-socket.close()
+captcha = wait()
 $logger.info "got catpcha as ... #{captcha}"
 driver.find_element(id: "ContentPlaceHolderBody_tbCaptha").clear()
 driver.find_element(id: "ContentPlaceHolderBody_tbCaptha").send_keys(captcha)
@@ -68,16 +76,25 @@ driver.find_element(id: "ContentPlaceHolderBody_btn_login").click()
 $logger.info "login page filled and clicked entering loop"
 ## check login 
 $runner = true
+exceptionCount = 0
 #driver.manage.window.resize_to(1024, 900)
 while($runner) do
+  begin
   sleepTime = 200
-  screenshot(driver)
+  
+  if (exceptionCount > 5)
+    $logger.info "exceptionCount more than desired threshold calling"
+    $logger.info "making precautionary calls ..."
+    make_call(1)
+    $logger.info "waiting for the input"
+    exceptionCount = wait().to_i
+  end
   ## check login
-
   $logger.info "visting check availability.."
+  
   driver.find_element(css: 'div.menu-1 > ul li a').click()
-  # driver.navigate.to "https://heliservices.uk.gov.in/User/CheckAvailability.aspx"
   sleep 5
+  $logger.info "..."
   driver.find_element(id: 'ContentPlaceHolderBody_txtDepartDate').click()
 
   $logger.info "taking screenshot ..."
@@ -91,17 +108,23 @@ while($runner) do
       3.times { |i| make_call(i); sleep 60 } 
       sleepTime = 20
     else
-      $logger.info "now change .."
+      $logger.info "no change .."
     end
   else
     $logger.error "some problem -> calendar month does not match"
     screenshot(driver)
     3.times { |i| make_call(i); sleep 60 }
     sleepTime = 20
-  end  
+  end
+  exceptionCount = 0  
   $logger.info "Sleeping for #{sleepTime} seconds"
   sleep sleepTime
+  rescue Exception => e
+    exceptionCount+=1
+    $logger.info "Exception count is #{exceptionCount}"
+    $logger.error "Got error  ...#{e.message} #{e.backtrace}"
+  end
 end
 driver.quit()
 $logger.info ".. deleting socket"
-FileUtils.rm(SOCKET)
+FileUtils.rm_rf(SOCKET)
