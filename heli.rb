@@ -29,7 +29,6 @@ Signal::trap("TERM") do
   $runner = false
 end
 
-$source = 0
 def save_source(driver) 
   $source += 1
   File.open(File.join(Dir.pwd, "html", "#{$source}.html"), "w") do |file|
