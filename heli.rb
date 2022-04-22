@@ -100,7 +100,9 @@ while($runner) do
     $logger.info "making precautionary calls ..."
     make_call(1)
     $logger.info "waiting for the input"
+    $logger.info "taking screenshot ..."
     screenshot(driver)
+    $logger.info "saving html source ..."
     save_source(driver)
     exceptionCount = wait().to_i
   end
