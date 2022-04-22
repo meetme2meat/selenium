@@ -9,13 +9,13 @@ SOCKET = "/tmp/selenium.sock"
 
 FileUtils.rm_rf(SOCKET)
 ## remove directory
-["screenshot", "logs"].each do |dir|
+["screenshot", "html", "logs"].each do |dir|
   newDir = File.join(Dir.pwd, dir)
   FileUtils.rm_rf(newDir)
 end
 
 ## create directory
-["screenshot", "logs"].each do |dir|
+["screenshot",  "html", "logs"].each do |dir|
   newDir = File.join(Dir.pwd, dir)
   FileUtils.mkdir_p(newDir) 
 end
@@ -24,9 +24,19 @@ end
 logFile = File.join(Dir.pwd, 'logs/', 'selenium.log')
 $logger = Logger.new(logFile)
 $screenshot = 0
-
+$source = 0
 Signal::trap("TERM") do 
   $runner = false
+end
+
+$source = 0
+def save_source(driver) 
+  $source += 1
+  File.open(File.join(Dir.pwd, "html", "#{$source}.html"), "w") do |file|
+    file.puts driver.page_source
+  end
+
+  $logger.info "scp #{ENV['SSH_HOST']}:/home/virendranegi/selenium/html/#{$source}.html ."
 end
 
 def screenshot(driver)
@@ -78,6 +88,8 @@ $logger.info "login page filled and clicked entering loop"
 ## check login 
 $runner = true
 exceptionCount = 0
+
+
 #driver.manage.window.resize_to(1024, 900)
 while($runner) do
   begin
@@ -89,6 +101,7 @@ while($runner) do
     make_call(1)
     $logger.info "waiting for the input"
     screenshot(driver)
+    save_source(driver)
     exceptionCount = wait().to_i
   end
   ## check login
